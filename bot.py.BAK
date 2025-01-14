@@ -1,0 +1,86 @@
+import asyncio
+import logging
+
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.types import Message
+from aiogram.filters import Command,  CommandObject, CommandStart, StateFilter
+from aiogram.enums import ParseMode
+from aiogram.enums.dice_emoji import DiceEmoji
+from aiogram.client.default import DefaultBotProperties
+from aiogram import html
+from aiogram.utils.formatting import (
+    Bold, as_list, as_marked_section, as_key_value, HashTag
+)
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher import StatesGroup, State
+
+from datetime import datetime
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import SecretStr
+from bot.config_reader import config
+
+logging.basicConfig(level=logging.INFO)
+bot = Bot(token="7888443086:AAEiZ9QdcNc2cQEGLMAeEV6y85jqL2yKA8w")
+dp = Dispatcher()
+
+class BikePark(StatesGroup):
+    action = State()
+    uslug = State()
+
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message):
+    builder = ReplyKeyboardBuilder()
+    builder.add(types.KeyboardButton(text ="Шерегеш байк-парк"))
+    builder.add(types.KeyboardButton(text="Белка в колесе"))
+    builder.adjust(2)
+    await message.answer(
+        "Выберите интересующий вас байк парк",
+        reply_markup=builder.as_markup(resize_keyboard=True),
+    )
+
+@dp.message(StateFilter(None), F.text.lower() == "шерегеш байк-парк")
+async def vozm(message:types.Message, state: FSMContext):
+    builder = ReplyKeyboardBuilder()
+    builder.add(types.KeyboardButton(text="Информация о байк-парке"))
+    builder.add(types.KeyboardButton(text="Список услуг"))
+    builder.add(types.KeyboardButton(text="Назад"))
+    builder.adjust(2)
+    await message.answer(
+        text = "Хороший выбр. Что Вас интересует?",
+        reply_markup=builder.as_markup(resize_keyboard=True)
+    )
+    await state.set_state(BikePark.action)
+
+@dp.message(F.text.lower() == "информация о байк-парке")
+async def inf(message:types.Message):
+    builder = ReplyKeyboardBuilder()
+    builder.add(types.KeyboardButton(text="Вернуться к выбору байк-парука"))
+    builder.add(types.KeyboardButton(text="Назад"))
+    builder.adjust(1)
+    await message.answer(
+        "Байк-парк распологается на секторе Е ...",
+        reply_markup=builder.as_markup(resize_keyboard=True)
+    )
+
+@dp.message(StateFilter(None), F.text.lower() == "список услуг")
+async def uslug(message:types.Message, state: FSMContext):
+    builder = ReplyKeyboardBuilder()
+    builder.add(types.KeyboardButton(text="Покупка байкпаса"))
+    builder.add(types.KeyboardButton(text="Бронирование велосипед"))
+    builder.add(types.KeyboardButton(text="Бронирование экиперовку"))
+    builder.add(types.KeyboardButton(text="Назад"))
+    builder.adjust(2)
+    await message.answer(
+        "Наш байк-парк предостовляет следующие услуги:",
+        reply_markup=builder.as_markup(resize_keyboard=True)
+    )
+    await state.set_state(BikePark.uslug)
+    
+# Запуск бота
+async def main():
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
