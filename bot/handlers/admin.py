@@ -99,7 +99,7 @@ async def corectData(message: Message, state: FSMContext, session: AsyncSession)
     
     if service is not None:
         await state.update_data(serviceId = service.idservice)
-        await message.answer(f"""Данные услуги:\nНазвание: {service.name}\nПродолжительность: {service.time}\nЦена: {service.price}\nМесто: {service.location}""")
+        await message.answer(f"""Данные услуги:\nНазвание: {service.nameService}\nПродолжительность: {service.duration}\nЦена: {service.price}\nМесто: {service.location}""")
         await message.answer(textwrap.dedent("Введите через ;\n1 - если хотите изменить название\n2 - если хотите изменить продолжительность\n3 - если хотите изменить цену\n4 - если хотите изменить место\nЗатем также через ; введите новые данные\nНапример: 2;3;спуск;1000"))
         await state.set_state(Admin.save_change_uslug)
 
@@ -116,9 +116,9 @@ async def saveChangeUslug(message: Message, state: FSMContext, session: AsyncSes
         x = int(len(data) / 2)
         for i in range(x):
             if data[i] == '1':
-                service.name = data[x+i]
+                service.nameService = data[x+i]
             elif data[i] == '2':
-                service.time = data[x+i]
+                service.duration = data[x+i]
             elif data[i] == '3':
                 service.price = int(data[x+i])
             elif data[i] == '4':

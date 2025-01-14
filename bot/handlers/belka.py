@@ -131,7 +131,7 @@ async def day(message: Message, state:FSMContext):
         reply_markup=make_row_keyboard(d_list, 6)
     )
     user_data = await state.get_data()
-    if 'time' is user_data:
+    if 'time' in user_data:
         await state.set_state(Belka.utog)
     else:
         await state.set_state(Belka.time)
@@ -166,7 +166,7 @@ async def day(message: Message, state:FSMContext, session: AsyncSession):
                                 datetime.strptime(user_data['time'], "%H:%M").time())
     await state.clear()
     await message.answer(
-        "Байкпас сохранен. Выберите дальнейшее действие",
+        "Услуга сохранена. Выберите дальнейшее действие",
         reply_markup=make_row_keyboard(do_in_belka)
     )
     await state.set_state(Belka.action)
