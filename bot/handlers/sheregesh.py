@@ -7,9 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
 from bot.db.requests import create_reservation
-from bot.handlers.states import Sheregesh, Belka
+from bot.handlers.states import Sheregesh
 from bot.handlers.data import hours, munuts, month, dayInMounth, days, months, uslTime, do_in_sheregesh, abonement_sheregesh
 from bot.handlers.data import uslug_in_sheregesh, time_sheregesh, bikes_sheregesh, akip_sheregesh, instruktor_sheregesh
+
 router = Router(name="ActionGesh")
 
 clok = []
@@ -90,7 +91,7 @@ async def instr(message: Message, state: FSMContext):
     await state.set_state(Sheregesh.mounth)
 
 @router.message(Sheregesh.vTime, F.text.in_(bikes_sheregesh))
-async def times(message: Message, state: FSMContext):
+async def timesBike(message: Message, state: FSMContext):
     await state.update_data(bike = message.text)
     await message.answer(
         "Выберите на какое время вам нужно забронировать велосипед",
@@ -99,7 +100,7 @@ async def times(message: Message, state: FSMContext):
     await state.set_state(Sheregesh.mounth)
 
 @router.message(Sheregesh.vTime, F.text.in_(akip_sheregesh))
-async def times(message: Message, state: FSMContext):
+async def timesAkip(message: Message, state: FSMContext):
     await state.update_data(uslug = message.text)
     await message.answer(
         "Выберите на какое время вам нужно забронировать экиперовку",
@@ -148,7 +149,7 @@ async def timeStart(message: Message, state:FSMContext):
     await state.set_state(Sheregesh.utog)
 
 @router.message(Sheregesh.utog, F.text.in_(clok))
-async def day(message: Message, state:FSMContext, session: AsyncSession):
+async def itog(message: Message, state:FSMContext, session: AsyncSession):
     await state.update_data(time = message.text)
     date = datetime.now()
     user_data = await state.get_data()
@@ -156,12 +157,12 @@ async def day(message: Message, state:FSMContext, session: AsyncSession):
     if 'bike' in user_data:
         await create_reservation(session, message.from_user.id, 
                                 user_data['uslug'], uslTime[user_data["pas"]], "Шерегеш", 
-                                datetime(date.year-1, month[user_data['mounth']], int(user_data['day'])),
+                                datetime(date.year, month[user_data['mounth']], int(user_data['day'])),
                                 datetime.strptime(user_data['time'], "%H:%M").time(), nameBike=user_data['bike'])
     else:
         await create_reservation(session, message.from_user.id, 
                                 user_data['uslug'], uslTime[user_data["pas"]], "Шерегеш", 
-                                datetime(date.year-1, month[user_data['mounth']], int(user_data['day'])),
+                                datetime(date.year, month[user_data['mounth']], int(user_data['day'])),
                                 datetime.strptime(user_data['time'], "%H:%M").time())
     await state.clear()
     await message.answer(

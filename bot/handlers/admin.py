@@ -6,8 +6,8 @@ from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, Key
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
 
-from bot.db.requests import get_user_by_id, ensure_service, get_service_by_id, get_idService
-from bot.db.requests import get_bike_by_id, get_idBike, ensure_bike, list_bron, delete_uslug, delete_bike
+from bot.db.requests import get_user_by_id, new_service, get_service_by_id, get_idService
+from bot.db.requests import get_bike_by_id, get_idBike, new_bike, list_bron, delete_uslug, delete_bike
 from bot.db.requests import get_id_all_users, get_id_users
 from bot.db.models import Users, Services, Reservation, Bikes
 from bot.handlers.states import Admin
@@ -63,7 +63,7 @@ async def newData(message: Message, state: FSMContext, session: AsyncSession):
     s = message.text
     data = s.split(';')
     if(len(data) == 5):
-        inf = await ensure_service(session, int(data[0]), data[1], data[2], int(data[3]), data[4])
+        inf = await new_service(session, int(data[0]), data[1], data[2], int(data[3]), data[4])
         if (inf == 101):
             await message.answer("Данный id уже занят")
         else:
@@ -182,7 +182,7 @@ async def newData(message: Message, state: FSMContext, session: AsyncSession):
     s = message.text
     data = s.split(';')
     if(len(data) == 2):
-        inf = await ensure_bike(session, int(data[0]), data[1])
+        inf = await new_bike(session, int(data[0]), data[1])
         if (inf == 101):
             await message.answer("Данный id уже занят")
         else:
@@ -278,7 +278,7 @@ async def del_uslug(message: Message, state: FSMContext, session: AsyncSession):
     await state.set_state(Admin.work)
         
 @router.message(Admin.work, F.text == vozm[7])
-async def choice_del_Bike(message: Message, state: FSMContext, session: AsyncSession):
+async def choice_del_bike(message: Message, state: FSMContext, session: AsyncSession):
     await message.answer(
         "Если знаете id велосипеда введите его\nЕсли нет, то укажите его название",
         reply_markup=ReplyKeyboardRemove()

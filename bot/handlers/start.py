@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from bot.handlers.states import StartBot
 
-from bot.db.requests import ensure_user, get_user_by_id
+from bot.db.requests import check_new_user, get_user_by_id
 
 router = Router(name="Start Router")
 
@@ -19,7 +19,7 @@ def make_row_keyboard(items: list[str], kol_bt: int = 2) -> ReplyKeyboardMarkup:
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext, session: AsyncSession):
-    user = await ensure_user(session, message.from_user.id)
+    user = await check_new_user(session, message.from_user.id)
     if user is not None:
         await message.answer(
             f"{user[0]} Добро пожаловать\nВыберите интересующий вас байк парк",
@@ -45,7 +45,6 @@ async def reg(message: Message, state: FSMContext, session: AsyncSession):
             reply_markup=make_row_keyboard(bike_parks)
     )
     
-
 @router.message(Command("user"))
 async def bikePark(message: Message, state: FSMContext):
     await state.clear()

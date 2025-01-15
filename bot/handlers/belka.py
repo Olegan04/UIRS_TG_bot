@@ -27,14 +27,14 @@ async def cmd_belka(message: Message, state: FSMContext):
     await state.set_state(Belka.action)
 
 @router.message(Belka.action, F.text == do_in_belka[0])
-async def shInf(message: Message, state: FSMContext):
+async def belkaInf(message: Message, state: FSMContext):
     await message.answer(
         "Данный байк парк находится в Белокурихе в лесной заимке",
         reply_markup=make_row_keyboard([do_in_belka[1],])
     )
 
 @router.message(Belka.action, F.text == do_in_belka[1])
-async def shUslug(message: Message, state: FSMContext):
+async def belkaUslug(message: Message, state: FSMContext):
     date = datetime.now()
     m = date.month
     if(m < 9):
@@ -49,7 +49,7 @@ async def shUslug(message: Message, state: FSMContext):
         )
 
 @router.message(Belka.uslug, F.text == uslug_in_belka[0])
-async def bikePas(message: Message, state: FSMContext):
+async def zabros(message: Message, state: FSMContext):
     await state.update_data(uslug = 'Заброс')
     await message.answer(
         "Выберите время",
@@ -75,7 +75,7 @@ async def akipBron(message: Message, state: FSMContext):
     await state.set_state(Belka.vTime)
 
 @router.message(Belka.vTime, F.text.in_(bikes_belka))
-async def times(message: Message, state: FSMContext):
+async def timesBike(message: Message, state: FSMContext):
     await state.update_data(bike = message.text)
     await message.answer(
         "Выберите на какое время вам нужно забронировать велосипед",
@@ -84,7 +84,7 @@ async def times(message: Message, state: FSMContext):
     await state.set_state(Belka.mounth)
 
 @router.message(Belka.vTime, F.text.in_(akip_belka))
-async def times(message: Message, state: FSMContext):
+async def timesAkip(message: Message, state: FSMContext):
     await state.update_data(uslug = message.text)
     await message.answer(
         "Выберите на какое время вам нужно забронировать экиперовку",
@@ -93,7 +93,7 @@ async def times(message: Message, state: FSMContext):
     await state.set_state(Belka.mounth)
 
 @router.message(Belka.mounth, F.text.in_(clook))
-async def brone(message: Message, state: FSMContext):
+async def broneZabros(message: Message, state: FSMContext):
     await state.update_data(time = message.text.lower())
     await state.update_data(pas = "на спуск")
     date = datetime.now()
@@ -146,7 +146,7 @@ async def timeStart(message: Message, state:FSMContext):
     await state.set_state(Belka.utog)
 
 @router.message(Belka.utog)
-async def day(message: Message, state:FSMContext, session: AsyncSession):
+async def itog(message: Message, state:FSMContext, session: AsyncSession):
     date = datetime.now()
     user_data = await state.get_data()
     if 'day' not in  user_data:

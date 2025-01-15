@@ -28,7 +28,7 @@ async def get_bike_by_id(session: AsyncSession, idBike: int) -> Bikes | None:
     stmt = select(Bikes).where(Bikes.id_bike == idBike)
     return await session.scalar(stmt)
 
-async def ensure_user(session: AsyncSession, user_id: int) -> list | None:
+async def check_new_user(session: AsyncSession, user_id: int) -> list | None:
     existing_user = await get_user_by_id(session, user_id)
     if existing_user is not None:
         return [existing_user.name, existing_user.famaly]
@@ -37,7 +37,7 @@ async def ensure_user(session: AsyncSession, user_id: int) -> list | None:
     await session.commit()
     return None
 
-async def ensure_service(session: AsyncSession, service_id: int, name: str, time: str, price: int, location: str) -> int:
+async def new_service(session: AsyncSession, service_id: int, name: str, time: str, price: int, location: str) -> int | None:
     existing_service = await get_service_by_id(session, service_id)
     if existing_service is not None:
         return 101
@@ -45,7 +45,7 @@ async def ensure_service(session: AsyncSession, service_id: int, name: str, time
     session.add(service)
     await session.commit()
 
-async def ensure_bike(session: AsyncSession, bike_id: int, name: int) -> int:
+async def new_bike(session: AsyncSession, bike_id: int, name: int) -> int | None:
     existing_bike = await get_bike_by_id(session, bike_id)
     if existing_bike is not None:
         return 101
@@ -68,7 +68,7 @@ async def create_reservation(session: AsyncSession, user_id: int, service_name: 
     session.add(bron)
     await session.commit()
 
-async def list_bron(session: AsyncSession, date: date, location: str) -> Reservation | Services | Bikes | Users | None:
+async def list_bron(session: AsyncSession, date: date, location: str):
     stmt = (
         select(Users.name, Users.famaly, Users.namber, Services.nameService, Services.duration, Reservation.time, Bikes.nameBike)
         .join(Services, Reservation.idService == Services.idservice)
